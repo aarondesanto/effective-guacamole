@@ -31,7 +31,15 @@ function canContinue(p1, p2) {
   }
   return false;
 };
-
+function checkWinner(p1, p2) {
+  if (p1.hp === 0) {
+    return "p2";
+  } else if (p2.hp === 0) {
+    return "p1";
+  } else {
+    console.log("Wow the fight's over and they're both alive.  Something broke and IDK what.  Good luck finding it, loser.");
+  }
+};
 
 var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
   var p1DamageTaken = 0,
@@ -55,6 +63,9 @@ var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
   p1.hp = p1.hp - p1DamageTaken;
   p2.hp = p2.hp - p2DamageTaken;
 
+  p1.exp = p1.exp + p2DamageTaken;
+  p2.exp = p2.exp + p1DamageTaken;
+
   // Prevent negative HP as described above
   if (p1.hp < 0) {
     p1.hp = 0;
@@ -69,20 +80,27 @@ var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
 
 var Fight = function Fight(p1, p2) {
   // Insert check for in-combat players here
-  // Players should always be in combat -during- a fight.
+
   p1.inCombat = true;
   p2.inCombat = true;
 
-  console.log(canContinue(p1, p2));
   var firstBlood = new InstanceOfCombat(p1, p2);
 
   while (canContinue(p1, p2)) {
     // Ask abut running here?
-    var newClash = new InstanceOfCombat(p1, p2);
+    var newBlood = new InstanceOfCombat(p1, p2);
   }
 
-  
+  if (checkWinner(p1, p2) === "p1") {
+    console.log(p1.name + " is the winner.");
+  } else if (checkWinner(p1, p2) === "p2") {
+    console.log(p2.name + " is the winner.");
+  } else {
+    console.log("They're both dad.");
+  }
 
+  p1.inCombat = false;
+  p2.inCombat = false;
 }
 
 // var expLvl1To6 = [40, 60, 90, 135, 202.5];
@@ -98,8 +116,6 @@ var Fight = function Fight(p1, p2) {
 
 var billy = new Character("BillyBobThorton");
 var wesley = new Character("WesleySnipes");
-// var inst1 = new InstanceOfCombat(billy, wesley);
-// var inst2 = new InstanceOfCombat(billy, wesley);
 var fight1 =  new Fight(billy, wesley);
 
 console.log(billy);
