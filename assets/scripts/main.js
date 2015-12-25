@@ -31,13 +31,24 @@ function canContinue(p1, p2) {
   }
   return false;
 };
-function checkWinner(p1, p2) {
-  if (p1.hp === 0) {
-    return "p2";
-  } else if (p2.hp === 0) {
-    return "p1";
+function checkExp(char) {
+  // ((40 * 1.5) * 1.5) * 1.5 --- etc.
+  var lvl = [0, 40, 100, 190, 325, 527, 830];
+  if (char.exp < lvl[1]) {
+    char.level = 1;
+  } else if (char.exp >= lvl[1] && char.exp < lvl[2]) {
+    char.level = 2;
+  } else if (char.exp >= lvl[2] && char.exp < lvl[3]) {
+    char.level = 3;
+  } else if (char.exp >= lvl[3] && char.exp < lvl[4]) {
+    char.level = 4;
+  } else if (char.exp >= lvl[4] && char.exp < lvl[5]) {
+    char.level = 5;
+  } else if (char.exp >= lvl[5] && char.exp < lvl[6]) {
+    char.level = 6;
   } else {
-    console.log("Wow the fight's over and they're both alive.  Something broke and IDK what.  Good luck finding it, loser.");
+    console.log("damn u scary");
+    char.level = 1337;
   }
 };
 
@@ -63,8 +74,8 @@ var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
   p1.hp = p1.hp - p1DamageTaken;
   p2.hp = p2.hp - p2DamageTaken;
 
-  p1.exp = p1.exp + p2DamageTaken;
-  p2.exp = p2.exp + p1DamageTaken;
+  p1.exp = p1.exp + (p2DamageTaken * 4);
+  p2.exp = p2.exp + (p1DamageTaken * 4);
 
   // Prevent negative HP as described above
   if (p1.hp < 0) {
@@ -74,15 +85,15 @@ var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
     p2.hp = 0;
   }
 
-  console.log(p1AttackRoll, p1DefenseRoll, p2AttackRoll, p2DefenseRoll);
-  console.log(p1DamageTaken, p2DamageTaken);
+  console.log("p1 att: " + p1AttackRoll, "p1 def: " + p1DefenseRoll, "p2 att: " + p2AttackRoll, "p2 def: " + p2DefenseRoll);
+  console.log("p1 dmg: " + p1DamageTaken, "p2 dmg: " + p2DamageTaken);
 };
 
 var Fight = function Fight(p1, p2) {
-  // Insert check for in-combat players here
-
   p1.inCombat = true;
   p2.inCombat = true;
+
+  billy.attack = 666; // DEBUG PURPOSES ONLY
 
   var firstBlood = new InstanceOfCombat(p1, p2);
 
@@ -91,19 +102,12 @@ var Fight = function Fight(p1, p2) {
     var newBlood = new InstanceOfCombat(p1, p2);
   }
 
-  if (checkWinner(p1, p2) === "p1") {
-    console.log(p1.name + " is the winner.");
-  } else if (checkWinner(p1, p2) === "p2") {
-    console.log(p2.name + " is the winner.");
-  } else {
-    console.log("They're both dad.");
-  }
+  checkExp(p1);
 
   p1.inCombat = false;
   p2.inCombat = false;
 }
 
-// var expLvl1To6 = [40, 60, 90, 135, 202.5];
 // var NPCDB = [
 //   {
 //     id: 10,
