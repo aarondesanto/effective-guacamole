@@ -1,0 +1,29 @@
+{
+  "name": "nameless",
+  "version": "1.0.0",
+  "description": "nameless rpg destined to die forgoton",
+  "main": "assets/scripts/main.js",
+  "dependencies": {
+    "prompt": "^0.2.14"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aarondesanto/effective-guacamole.git"
+  },
+  "keywords": [
+    "rpg",
+    "game",
+    "console",
+    "text"
+  ],
+  "author": "Aaron DeSanto",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aarondesanto/effective-guacamole/issues"
+  },
+  "homepage": "https://github.com/aarondesanto/effective-guacamole#readme"
+}
