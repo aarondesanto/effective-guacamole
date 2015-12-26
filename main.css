@@ -1,0 +1,36 @@
+html, body, div, p, input {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  -moz-box-sizing: border-box;
+       box-sizing: border-box;
+  font-family: monospace;
+  color: #FFF;
+  background-color: #000;
+}
+
+
+#user-input {
+  height: 28px;
+  width: 620px;
+  margin-left: 9px;
+  border: 1px solid #FFF;
+}
+#user-input:focus {
+  border: 2px solid red;
+}
+
+.content {
+  height: 360px;
+  width: 640px;
+  margin: 10% auto;
+  border: 1px solid #FFF;
+}
+
+#text-output {
+  overflow-y: auto;
+  height: 300px;
+  width: 620px;
+  margin: 10px auto;
+  border: 1px solid #FFF;
+}
