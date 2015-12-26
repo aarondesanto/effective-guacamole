@@ -8,8 +8,22 @@ html, body, div, p, input {
   color: #FFF;
   background-color: #000;
 }
-
-
+.content {
+  height: 360px;
+  width: 640px;
+  margin: 10% auto;
+  border: 1px solid #FFF;
+}
+#text-output {
+  overflow-y: auto;
+  height: 300px;
+  width: 620px;
+  margin: 10px auto;
+  border: 1px solid #FFF;
+}
+#text-output p {
+  font-size: 14px;
+}
 #user-input {
   height: 28px;
   width: 620px;
@@ -18,19 +32,4 @@ html, body, div, p, input {
 }
 #user-input:focus {
   border: 2px solid red;
-}
-
-.content {
-  height: 360px;
-  width: 640px;
-  margin: 10% auto;
-  border: 1px solid #FFF;
-}
-
-#text-output {
-  overflow-y: auto;
-  height: 300px;
-  width: 620px;
-  margin: 10px auto;
-  border: 1px solid #FFF;
 }

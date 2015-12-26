@@ -1,19 +1,25 @@
+// _____ Start of "Backend" Code _____ //
 var mainIn = document.getElementById("user-input"),
     mainOut = document.getElementById("text-output"),
     mainSubmit = document.getElementById("form-text");
+
 mainSubmit.addEventListener("submit", onUserInput, false);
 
 function writeToScreen(content) {
   var newMessage = document.createElement("p");
   newMessage.innerText = content;
   mainOut.appendChild(newMessage);
-}
+  mainOut.scrollTop = mainOut.scrollHeight;
+};
 function onUserInput(event) {
   event.preventDefault();
   writeToScreen(mainIn.value);
+  mainOut.scrollTop = mainOut.scrollHeight;
   mainSubmit.reset();
-}
+};
+// _____ End of "Backend" Code _____ //
 
+// _____ Start of Single State Functions _____ //
 function rando(min, max) { // Returns a random whole number between min and max (inclusive).
   return Math.floor(Math.random() * (max - min + 1)) + min; // Used for combat rolls.
 };
@@ -22,18 +28,6 @@ function attackRoll(char) {
 };
 function defenseRoll(char) {
   return rando(0, char.defense)
-};
-function canContinue(p1, p2) {
-  if (p1.hp > 0) {
-    if (p2.hp > 0) {
-      if (p1.run === false) {
-        if (p2.run === false) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
 };
 function checkExp(char) {
   // ((40 * 1.5) * 1.5) * 1.5 --- etc.
@@ -55,8 +49,9 @@ function checkExp(char) {
     char.level = 1337;
   }
 };
+// _____ End of Single State Functions _____ //
 
-
+// _____ Start of Constructors _____ //
 var Character = function Character(cName) {
   this.name = cName,
   this.level = 1,
@@ -69,64 +64,51 @@ var Character = function Character(cName) {
 };
 
 var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
-  var p1DamageTaken = 0,
-      p2DamageTaken = 0,
-      p1AttackRoll = attackRoll(p1),
-      p1DefenseRoll = defenseRoll(p1),
-      p2AttackRoll = attackRoll(p2),
-      p2DefenseRoll = defenseRoll(p2);
-  p1DamageTaken = p2AttackRoll - p1DefenseRoll;
-  p2DamageTaken = p1AttackRoll - p2DefenseRoll;
+  var p1DamageTaken = attackRoll(p2) - defenseRoll(p1),
+      p2DamageTaken = attackRoll(p1) - defenseRoll(p2);
 
-  // An attack roll of 0 minus a defense roll of >0 causes players to take negative damage.
-  if (p1DamageTaken < 0) {  // This converts all negative damage to 0.
+  if (p1DamageTaken < 0) {
     p1DamageTaken = 0;
-  }
+  } // Convert all negative damage taken to 0
   if (p2DamageTaken < 0) {
     p2DamageTaken = 0;
   }
 
-  p1.hp = p1.hp - p1DamageTaken;
-  p2.hp = p2.hp - p2DamageTaken;
-  p1.exp = p1.exp + (p2DamageTaken * 4);
-  p2.exp = p2.exp + (p1DamageTaken * 4);
+  p1.hp -= p1DamageTaken;
+  p2.hp -= p2DamageTaken;
+  p1.exp += (p2DamageTaken * 4);
+  p2.exp += (p1DamageTaken * 4);
 
-  // Prevent negative HP as described above
   if (p1.hp < 0) {
     p1.hp = 0;
-  }
+  } // Prevent negative HP
   if (p2.hp < 0) {
     p2.hp = 0;
   }
-  writeToScreen("p1 att: " + p1AttackRoll, "p1 def: " + p1DefenseRoll, "p2 att: " + p2AttackRoll, "p2 def: " + p2DefenseRoll);
-  writeToScreen("p1 dmg: " + p1DamageTaken, "p2 dmg: " + p2DamageTaken);
+  writeToScreen(p1.name + " damage taken: " + p1DamageTaken);
+  writeToScreen(p2.name + " damage taken: " + p2DamageTaken);
+  writeToScreen("...");
 };
 
 var Fight = function Fight(p1, p2) {
   p1.inCombat = true;
   p2.inCombat = true;
-  billy.attack = 666; // DEBUG PURPOSES ONLY
 
   var firstBlood = new InstanceOfCombat(p1, p2);
-  while (canContinue(p1, p2)) {
+  while (p1.hp > 0 && p2.hp > 0 && p1.run === false && p2.run === false) {
     // Ask abut running here?     ---mainIn.value---
     var newBlood = new InstanceOfCombat(p1, p2);
   }
+
   checkExp(p1);
   p1.inCombat = false;
   p2.inCombat = false;
 }
-// var NPCDB = [
-//   {
-//     id: 10,
-//     name: "Locust",
-//     hp: 3,
-//     attack: 1,
-//     defense: 1
-//   }
-// ];
-var billy = new Character("BillyBobThorton");
-var wesley = new Character("WesleySnipes");
+// _____ End of Constructors _____ //
+
+
+var billy = new Character("Billy Bob Thornton");
+var wesley = new Character("Wesley Snipes");
 var fight1 =  new Fight(billy, wesley);
 console.log(billy);
 console.log(wesley);
