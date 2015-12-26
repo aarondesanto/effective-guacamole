@@ -28,9 +28,14 @@ function between(min, max) { // Used for combat rolls.
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-// function rundo(percentage) {
-//   // Run roll here...
-// }
+function rundo(percentage) {
+  var theRoll = between(1, 100);
+  if (theRoll < percentage) {
+    return true;
+  } else {
+    return false;
+  }
+};
 
 function attackRoll(char) {
   return between(0, char.attack);
@@ -91,45 +96,51 @@ function createNewBlood(p1, p2) {
 };
 
 function canRun(p1, p2) {
-  var runFail = "You try and fail to run.",
-      runSuccess = "You run away like a chicken.  Bwak bwak bwak.";
+  var roll = 0;
+  function passFail(input) {
+    if (input) {
+      writeToScreen("You run away like a chicken.  Bwak bwak bwak.");
+    } else {
+      writeToScreen("You try and fail to run.");
+    }
+  }
 
   if (p1.level <= p2.level - 4) {
-    writeToScreen(runFail);
-    return false;
-
+    roll = rundo(10);
+    passFail(roll);
+    return roll;
   } else if (p1.level === p2.level - 3) {
-    writeToScreen(runFail);
-    return false;
-
+    roll = rundo(20);
+    passFail(roll);
+    return roll;
   } else if (p1.level === p2.level - 2) {
-    writeToScreen(runFail);
-    return false;
-
+    roll = rundo(30);
+    passFail(roll);
+    return roll;
   } else if (p1.level === p2.level - 1) {
-    writeToScreen(runFail);
-    return false;
-
+    roll = rundo(40);
+    passFail(roll);
+    return roll;
   } else if (p1.level === p2.level) {
-    writeToScreen(runSuccess);
-    return true;
-
+    roll = rundo(50);
+    passFail(roll);
+    return roll;
   } else if (p1.level === p2.level + 1) {
-    writeToScreen(runSuccess);
-    return true;
-
+    roll = rundo(60);
+    passFail(roll);
+    return roll;
   } else if (p1.level === p2.level + 2) {
-    writeToScreen(runSuccess);
-    return true;
-
+    roll = rundo(70);
+    passFail(roll);
+    return roll;
   } else if (p1.level === p2.level + 3) {
-    writeToScreen(runSuccess);
-    return true;
-
+    roll = rundo(80);
+    passFail(roll);
+    return roll;
   } else if (p1.level >= p2.level + 4) {
-    writeToScreen(runSuccess);
-    return true;
-
+    roll = rundo(90);
+    passFail(roll);
+    return roll;
   } else {
     console.log("There was an error at canRun() on line 75ish.");
   }
@@ -176,17 +187,16 @@ var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
 };
 
 var Fight = function Fight(p1, p2) {
-  p1.inCombat = p2.inCombat = true;
-
-  var firstBlood = new InstanceOfCombat(p1, p2);
-
   if (p1.hp > 0 && p2.hp > 0) {
+    p1.inCombat = p2.inCombat = true;
     var nextBlood = window.setTimeout(createNewBlood, 1500, p1, p2);
   } else {
-    checkAndAwardExp(p1);
-    checkAndAwardExp(p2);
-
-    p1.inCombat = p2.inCombat = false;
+    if (p1.hp === 0) {
+      writeToScreen("Cannot start fight. " + p1.name + " is dead.");
+    }
+    if (p2.hp === 0) {
+      writeToScreen("Cannot start fight. " + p2.name + " is dead.");
+    }
   }
 };
 // _____ End of Constructors _____ //
