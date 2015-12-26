@@ -1,7 +1,8 @@
 // _____ Start of "Backend" Code _____ //
 var mainIn = document.getElementById("user-input"),
     mainOut = document.getElementById("text-output"),
-    mainSubmit = document.getElementById("form-text");
+    mainSubmit = document.getElementById("form-text"),
+    usrIn = mainIn.value;
 
 mainSubmit.addEventListener("submit", onUserInput, false);
 
@@ -47,6 +48,60 @@ function checkExp(char) {
   } else {
     writeToScreen("damn u scary");
     char.level = 1337;
+  };
+};
+function createNewBlood(p1, p2) {
+  var textOut = document.getElementById("text-output");
+
+  if (textOut.lastChild.innerText === ("run" || "RUN" || "Run")) {
+    if (runFunction(p1, p2)) {
+      return false;
+    }
+  }
+
+  var newBlood = new InstanceOfCombat(p1, p2);
+
+  if (p1.hp > 0 && p2.hp > 0) {
+    var anotherTimeout = window.setTimeout(createNewBlood, 1500, p1, p2);
+  } else {
+    checkExp(p1);
+    checkExp(p2);
+    p1.inCombat = p2.inCombat = false;
+  }
+};
+function runFunction(p1, p2) {
+  var runFail = "You try and fail to run.",
+      runSuccess = "You run away like a chicken.  Bwak bwak bwak.";
+
+  if (p1.level <= p2.level - 4) {
+    writeToScreen(runFail);
+    return false;
+  } else if (p1.level === p2.level - 3) {
+    writeToScreen(runFail);
+    return false;
+  } else if (p1.level === p2.level - 2) {
+    writeToScreen(runFail);
+    return false;
+  } else if (p1.level === p2.level - 1) {
+    writeToScreen(runFail);
+    return false;
+  } else if (p1.level === p2.level) {
+    writeToScreen(runSuccess);
+    return true;
+  } else if (p1.level === p2.level + 1) {
+    writeToScreen(runSuccess);
+    return true;
+  } else if (p1.level === p2.level + 2) {
+    writeToScreen(runSuccess);
+    return true;
+  } else if (p1.level === p2.level + 3) {
+    writeToScreen(runSuccess);
+    return true;
+  } else if (p1.level >= p2.level + 4) {
+    writeToScreen(runSuccess);
+    return true;
+  } else {
+    console.log("There was an error at runFunction() on line 72.");
   }
 };
 // _____ End of Single State Functions _____ //
@@ -59,8 +114,7 @@ var Character = function Character(cName) {
   this.hp = 8,
   this.attack = 2,
   this.defense = 2,
-  this.inCombat = false,
-  this.run = false;
+  this.inCombat = false;
 };
 
 var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
@@ -88,27 +142,26 @@ var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
   writeToScreen(p1.name + " damage taken: " + p1DamageTaken);
   writeToScreen(p2.name + " damage taken: " + p2DamageTaken);
   writeToScreen("...");
+
 };
 
 var Fight = function Fight(p1, p2) {
-  p1.inCombat = true;
-  p2.inCombat = true;
+  p1.inCombat = p2.inCombat = true;
 
   var firstBlood = new InstanceOfCombat(p1, p2);
-  while (p1.hp > 0 && p2.hp > 0 && p1.run === false && p2.run === false) {
-    // Ask abut running here?     ---mainIn.value---
-    var newBlood = new InstanceOfCombat(p1, p2);
+
+  if (p1.hp > 0 && p2.hp > 0) {
+    var firstWait = window.setTimeout(createNewBlood, 1500, p1, p2);
+  } else {
+    checkExp(p1);
+    checkExp(p2);
+    p1.inCombat = p2.inCombat = false;
   }
 
-  checkExp(p1);
-  p1.inCombat = false;
-  p2.inCombat = false;
-}
+};
 // _____ End of Constructors _____ //
 
 
 var billy = new Character("Billy Bob Thornton");
 var wesley = new Character("Wesley Snipes");
 var fight1 =  new Fight(billy, wesley);
-console.log(billy);
-console.log(wesley);
