@@ -1,107 +1,137 @@
 // _____ Start of "Backend" Code _____ //
 var mainIn = document.getElementById("user-input"),
     mainOut = document.getElementById("text-output"),
-    mainSubmit = document.getElementById("form-text"),
-    usrIn = mainIn.value;
+    mainSubmit = document.getElementById("form-text");
 
 mainSubmit.addEventListener("submit", onUserInput, false);
+
+function onUserInput(event) {
+  event.preventDefault();
+  writeToScreen(mainIn.value); // Write form input to mainOut
+  mainOut.scrollTop = mainOut.scrollHeight; // Scroll to bottom
+  mainSubmit.reset();
+};
 
 function writeToScreen(content) {
   var newMessage = document.createElement("p");
   newMessage.innerText = content;
   mainOut.appendChild(newMessage);
-  mainOut.scrollTop = mainOut.scrollHeight;
-};
-function onUserInput(event) {
-  event.preventDefault();
-  writeToScreen(mainIn.value);
-  mainOut.scrollTop = mainOut.scrollHeight;
-  mainSubmit.reset();
+  mainOut.scrollTop = mainOut.scrollHeight; // Scroll to bottom
 };
 // _____ End of "Backend" Code _____ //
 
+
+// ---------- Start of Library ---------- //
+// -- //                     // -- //
 // _____ Start of Single State Functions _____ //
-function rando(min, max) { // Returns a random whole number between min and max (inclusive).
-  return Math.floor(Math.random() * (max - min + 1)) + min; // Used for combat rolls.
+function between(min, max) { // Used for combat rolls.
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
+
+// function rundo(percentage) {
+//   // Run roll here...
+// }
+
 function attackRoll(char) {
-  return rando(0, char.attack);
+  return between(0, char.attack);
 };
+
 function defenseRoll(char) {
-  return rando(0, char.defense)
+  return between(0, char.defense)
 };
-function checkExp(char) {
+
+function checkAndAwardExp(char) {
   // ((40 * 1.5) * 1.5) * 1.5 --- etc.
-  var lvl = [0, 40, 100, 190, 325, 527, 830];
-  if (char.exp < lvl[1]) {
-    char.level = 1;
-  } else if (char.exp >= lvl[1] && char.exp < lvl[2]) {
-    char.level = 2;
-  } else if (char.exp >= lvl[2] && char.exp < lvl[3]) {
-    char.level = 3;
-  } else if (char.exp >= lvl[3] && char.exp < lvl[4]) {
-    char.level = 4;
-  } else if (char.exp >= lvl[4] && char.exp < lvl[5]) {
-    char.level = 5;
-  } else if (char.exp >= lvl[5] && char.exp < lvl[6]) {
-    char.level = 6;
+  var lvl = [0, 40, 100, 190, 325, 527, 830],
+      cxp = char.exp,
+      clvl = char.level;
+
+  function checkExp(lv1, lv2) {
+    if (cxp >= lvl[lv1] && cxp < lvl[lv2]) {
+      return true;
+    }
+    return false;
+  }
+
+  if (cxp < lvl[1]) {
+    clvl = 1;
+  } else if (checkExp(1, 2)) {
+    clvl = 2;
+  } else if (checkExp(2, 3)) {
+    clvl = 3;
+  } else if (checkExp(3, 4)) {
+    clvl = 4;
+  } else if (checkExp(4, 5)) {
+    clvl = 5;
+  } else if (checkExp(5, 6)) {
+    clvl = 6;
   } else {
     writeToScreen("damn u scary");
-    char.level = 1337;
+    clvl = 1337;
   };
 };
+
 function createNewBlood(p1, p2) {
   var textOut = document.getElementById("text-output");
-
   if (textOut.lastChild.innerText === ("run" || "RUN" || "Run")) {
-    if (runFunction(p1, p2)) {
+    if (canRun(p1, p2)) {
       return false;
     }
   }
+  var newBlood = new InstanceOfCombat(p1, p2); // The actual IOC
 
-  var newBlood = new InstanceOfCombat(p1, p2);
-
-  if (p1.hp > 0 && p2.hp > 0) {
-    var anotherTimeout = window.setTimeout(createNewBlood, 1500, p1, p2);
+  if (p1.hp > 0 && p2.hp > 0) { //
+    var nextBlood = window.setTimeout(createNewBlood, 1500, p1, p2); // Calls itself
   } else {
-    checkExp(p1);
-    checkExp(p2);
+    checkAndAwardExp(p1);
+    checkAndAwardExp(p2);
+
     p1.inCombat = p2.inCombat = false;
   }
 };
-function runFunction(p1, p2) {
+
+function canRun(p1, p2) {
   var runFail = "You try and fail to run.",
       runSuccess = "You run away like a chicken.  Bwak bwak bwak.";
 
   if (p1.level <= p2.level - 4) {
     writeToScreen(runFail);
     return false;
+
   } else if (p1.level === p2.level - 3) {
     writeToScreen(runFail);
     return false;
+
   } else if (p1.level === p2.level - 2) {
     writeToScreen(runFail);
     return false;
+
   } else if (p1.level === p2.level - 1) {
     writeToScreen(runFail);
     return false;
+
   } else if (p1.level === p2.level) {
     writeToScreen(runSuccess);
     return true;
+
   } else if (p1.level === p2.level + 1) {
     writeToScreen(runSuccess);
     return true;
+
   } else if (p1.level === p2.level + 2) {
     writeToScreen(runSuccess);
     return true;
+
   } else if (p1.level === p2.level + 3) {
     writeToScreen(runSuccess);
     return true;
+
   } else if (p1.level >= p2.level + 4) {
     writeToScreen(runSuccess);
     return true;
+
   } else {
-    console.log("There was an error at runFunction() on line 72.");
+    console.log("There was an error at canRun() on line 75ish.");
   }
 };
 // _____ End of Single State Functions _____ //
@@ -118,20 +148,20 @@ var Character = function Character(cName) {
 };
 
 var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
-  var p1DamageTaken = attackRoll(p2) - defenseRoll(p1),
-      p2DamageTaken = attackRoll(p1) - defenseRoll(p2);
+  var p1Damage = attackRoll(p1) - defenseRoll(p2),
+      p2Damage = attackRoll(p2) - defenseRoll(p1);
 
-  if (p1DamageTaken < 0) {
-    p1DamageTaken = 0;
+  if (p1Damage < 0) {
+    p1Damage = 0;
   } // Convert all negative damage taken to 0
-  if (p2DamageTaken < 0) {
-    p2DamageTaken = 0;
+  if (p2Damage < 0) {
+    p2Damage = 0;
   }
 
-  p1.hp -= p1DamageTaken;
-  p2.hp -= p2DamageTaken;
-  p1.exp += (p2DamageTaken * 4);
-  p2.exp += (p1DamageTaken * 4);
+  p1.hp -= p2Damage;
+  p2.hp -= p1Damage;
+  p1.exp += (p1Damage * 4);
+  p2.exp += (p2Damage * 4);
 
   if (p1.hp < 0) {
     p1.hp = 0;
@@ -139,10 +169,10 @@ var InstanceOfCombat = function InstanceOfCombat(p1, p2) {
   if (p2.hp < 0) {
     p2.hp = 0;
   }
-  writeToScreen(p1.name + " damage taken: " + p1DamageTaken);
-  writeToScreen(p2.name + " damage taken: " + p2DamageTaken);
-  writeToScreen("...");
 
+  writeToScreen(p1.name + " damage taken: " + p2Damage);
+  writeToScreen(p2.name + " damage taken: " + p1Damage);
+  writeToScreen("...");
 };
 
 var Fight = function Fight(p1, p2) {
@@ -151,17 +181,36 @@ var Fight = function Fight(p1, p2) {
   var firstBlood = new InstanceOfCombat(p1, p2);
 
   if (p1.hp > 0 && p2.hp > 0) {
-    var firstWait = window.setTimeout(createNewBlood, 1500, p1, p2);
+    var nextBlood = window.setTimeout(createNewBlood, 1500, p1, p2);
   } else {
-    checkExp(p1);
-    checkExp(p2);
+    checkAndAwardExp(p1);
+    checkAndAwardExp(p2);
+
     p1.inCombat = p2.inCombat = false;
   }
-
 };
 // _____ End of Constructors _____ //
+// -- //                     // -- //
+// ---------- End of Library ---------- //
 
 
-var billy = new Character("Billy Bob Thornton");
-var wesley = new Character("Wesley Snipes");
+var billy = new Character("Billy Bob Thornton"),
+    wesley = new Character("Wesley Snipes"),
+    bruce = new Character("Bruce Willis"),
+    chuck = new Character("Chuck Norris"),
+    jet = new Character("Jet Li"),
+    jackie = new Character("Jackie Chan"),
+    snoop = new Character("Snoop Dogg"),
+    stephen = new Character("Stephen Colbert");
+
+chuck.attack = 9001;
+chuck.level = 1337;
+chuck.exp = 999999999999999;
+bruce.level = 5;
+jet.level = 10;
+jackie.level = 6;
+snoop.level = 2;
+stephen.level = 3;
+
+
 var fight1 =  new Fight(billy, wesley);
